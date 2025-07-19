@@ -1,0 +1,30 @@
+plugins {
+    id "com.github.node-gradle.node" version "7.1.0"
+    id "base"
+}
+
+tasks.register('buildFrontend', NpxTask) {
+    dependsOn npmInstall
+    command = 'npm'
+    args = ['run', 'build']
+}
+
+tasks.register('devRun', NpxTask) {
+    dependsOn npmInstall
+    command = 'npm'
+    args = ['run', 'dev']
+}
+
+tasks.register('cleanFrontend', Delete) {
+    group = "build"
+    description = "Cleans the Vite distribution folder"
+    delete file("dist")
+}
+
+node {
+    download = true
+    version = "22.12.0"
+}
+
+tasks.clean.dependsOn cleanFrontend
+tasks.build.dependsOn buildFrontend

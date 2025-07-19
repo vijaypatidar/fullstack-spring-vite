@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'checkstyle'
+    id 'com.google.cloud.tools.jib' version '3.4.1'
+}
+
+group = 'com.example'
+version = '1.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+checkstyle {
+    ignoreFailures = false
+    maxErrors = 0
+    toolVersion = "10.26.1"
+    configFile = rootProject.file("checkstyle/checkstyle.xml")
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+jib {
+    from {
+        image = 'eclipse-temurin:21-jre'
+    }
+    to {
+        image = 'your-app-docker-image'
+    }
+    container{
+        mainClass = 'com.example.App'
+        jvmFlags = []
+        ports = ["8080"]
+    }
+}
+
+bootJar {
+    // Include Vite build output in the final Spring Boot JAR
+    dependsOn ':frontend:build'
+    from("../frontend/dist") {
+        into "BOOT-INF/classes/static" // Place files in Spring Boot's static directory
+    }
+}
+
+tasks.clean.dependsOn ':frontend:clean'
+tasks.build.dependsOn ':frontend:build'

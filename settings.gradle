@@ -1,0 +1,4 @@
+rootProject.name = 'nextgen-seamless-upgrade'
+
+include 'frontend'
+include 'backend'
